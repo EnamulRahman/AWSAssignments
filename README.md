@@ -1,3 +1,3 @@
 # AWSAssignments
 Documenting my AWS assignments
-![picture]([Screenshot 2025-12-17 140304.png](https://github.com/EnamulRahman/AWSAssignments/blob/5cca7110a164838e85e5934c0b92dd5e0f329bd6/Screenshot%202025-12-17%20140304.png))
+![picture](https://github.com/EnamulRahman/AWSAssignments/blob/2d32595a7eb53f6b4dea630cb090ac8baf70d1ac/images/Screenshot%202025-12-17%20140304.png)
