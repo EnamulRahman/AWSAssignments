@@ -97,3 +97,150 @@ All billable resources (EC2 instances, NAT Gateway, Elastic IP) were terminated 
 
 This assignment demonstrates a solid understanding of AWS networking fundamentals, including VPC design, subnet isolation, routing, internet access patterns, and security group configuration following best practices.
 
+------------------------------------------------------------------------------------------------------------//////////////////////
+
+
+# Assignment 2 – Application Load Balancer (ALB)
+
+## Overview
+
+This assignment demonstrates a common DevOps architecture pattern: deploying multiple EC2 instances behind an Application Load Balancer (ALB). The goal is to ensure traffic is evenly distributed, instances are isolated from direct public access, and health checks determine which instances receive traffic.
+
+---
+
+## Architecture
+
+* **VPC**: Custom VPC
+* **Subnets**:
+
+  * 2 Public Subnets (different Availability Zones) – used by the ALB
+  * 2 Private Subnets (different Availability Zones) – used by EC2 instances
+* **Load Balancer**: Application Load Balancer (Internet-facing)
+* **Compute**: 2 EC2 instances
+* **Web Server**: Apache (installed via user-data)
+
+All inbound traffic is handled by the ALB. EC2 instances are not publicly accessible.
+
+---
+
+## Objectives Achieved
+
+* Deployed two EC2 instances across different Availability Zones
+* Installed and configured a web server using EC2 user-data
+* Created an Application Load Balancer with HTTP listener (port 80)
+* Configured a target group with health checks
+* Implemented proper security group isolation
+* Verified round-robin traffic distribution
+
+---
+
+## Step-by-Step Implementation
+
+### 1. EC2 Instances
+
+* Launched **two EC2 instances** in the same VPC
+* Instances placed in **different Availability Zones**
+* Instances deployed in **private subnets** (no public IPs)
+* Apache installed using user-data
+* Each instance serves different content for testing
+
+Example user-data:
+
+```bash
+#!/bin/bash
+yum update -y
+yum install httpd -y
+systemctl start httpd
+systemctl enable httpd
+echo "Hello from Instance 1" > /var/www/html/index.html
+```
+
+---
+
+### 2. Application Load Balancer
+
+* Created an **Internet-facing Application Load Balancer**
+* Attached ALB to **two public subnets** (different AZs)
+* Configured **HTTP listener on port 80**
+* Created a **target group** using HTTP protocol
+* Registered both EC2 instances
+* Configured health check:
+
+  * Protocol: HTTP
+  * Path: `/`
+  * Port: traffic port
+
+---
+
+### 3. Security Groups
+
+#### ALB Security Group
+
+* Inbound:
+
+  * HTTP (80) from `0.0.0.0/0`
+* Outbound:
+
+  * All traffic allowed
+
+#### EC2 Security Group
+
+* Inbound:
+
+  * HTTP (80) **only from ALB Security Group**
+* Outbound:
+
+  * All traffic allowed
+
+This ensures EC2 instances cannot be accessed directly from the internet.
+
+---
+
+## Testing & Validation
+
+### Load Balancer Test
+
+* Accessed the ALB DNS name in a browser
+* Observed successful page load
+* Refreshed multiple times to confirm **round-robin load balancing**
+* Verified responses alternated between instances
+
+### Health Checks
+
+* Checked Target Group health status
+* Confirmed both EC2 instances were marked **Healthy**
+
+### Local Instance Validation
+
+* Connected to EC2 instances
+* Verified Apache was running
+* Used `curl localhost` to confirm local web server response
+
+---
+
+## Screenshots
+
+The following screenshots are included to document the deployment:
+
+* VPC and subnet configuration
+* ALB configuration and listeners
+* Target group health status
+* Security group rules
+* Browser test showing load balancing
+
+---
+
+## Key Learnings
+
+* How Application Load Balancers distribute traffic
+* Importance of health checks in high availability systems
+* Proper use of security groups for isolation
+* Difference between public and private subnets
+* Real-world DevOps infrastructure patterns
+
+---
+
+## Conclusion
+
+This assignment successfully demonstrates a production-style AWS architecture where EC2 instances are protected behind an Application Load Balancer. The setup ensures scalability, availability, and security while following AWS best practices.
+
